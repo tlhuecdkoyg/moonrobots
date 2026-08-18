@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install MoonBit
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: Show toolchain
+        run: moon version
+
+      - name: Fetch dependencies
+        run: moon update
+
+      - name: Check formatting
+        run: moon fmt --check
+
+      - name: Check
+        run: moon check --deny-warn
+
+      - name: Test all core backends
+        run: moon test --target all --deny-warn
+
+      - name: Build
+        run: moon build --target all
+
+      - name: CLI smoke test
+        run: |
+          moon run cmd/main -- check examples/robots.txt ExampleBot https://example.com/private/public/page
+          if moon run cmd/main -- check examples/robots.txt ExampleBot https://example.com/private/secret; then
+            echo "expected the blocked-path check to exit with status 1"
+            exit 1
+          else
+            test "$?" -eq 1
+          fi
+          moon run cmd/main -- lint examples/robots.txt
+          moon run cmd/main -- format examples/robots.txt
+          moon run cmd/main -- analyze examples/robots.txt
+          moon run cmd/main -- trace examples/robots.txt ExampleBot /private/secret
+          moon run cmd/main -- fix-safe examples/robots.txt
+
+      - name: Validate Studio snapshot and browser bundle
+        run: |
+          moon run cmd/snapshot -- examples/robots.txt ExampleBot /private/secret | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const x=JSON.parse(s);if(x.schemaVersion!==1)process.exit(1)})"
+          node --check _build/js/debug/build/web/app/app.js
+          node --check tools/browser_crawler.mjs
+          node --check tools/studio_server.mjs
+          node --test tools/browser_crawler_test.mjs
+
+      - name: Validate package
+        run: moon package --list

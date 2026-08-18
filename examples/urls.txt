@@ -1,0 +1,5 @@
+/
+/private/report.pdf
+/private/public/index.html
+/archive/drafts/article
+/robots.txt

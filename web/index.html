@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="MoonRobots Studio——使用 MoonBit 构建的可解释 RFC 9309 robots.txt 分析器。" />
+    <title>MoonRobots｜网站抓取与策略监控中心</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-one"></div>
+    <div class="ambient ambient-two"></div>
+
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="MoonRobots Studio home">
+        <span class="brand-mark" aria-hidden="true">
+          <span class="moon"></span>
+          <span class="antenna"></span>
+        </span>
+        <span>
+          <strong>MoonRobots</strong>
+          <small data-i18n="brandSubtitle">RFC 9309 分析工作台</small>
+        </span>
+      </a>
+      <div class="topbar-center">
+        <span class="runtime-status busy" id="runtime-status">正在加载 MoonBit 引擎…</span>
+      </div>
+      <nav class="top-actions" aria-label="Application actions">
+        <label class="language-picker">
+          <span class="sr-only">语言</span>
+          <select id="language-select" aria-label="选择界面语言">
+            <option value="zh-CN" selected>中文</option>
+            <option value="en">English</option>
+          </select>
+        </label>
+        <button class="icon-button" id="theme-button" title="Toggle theme" aria-label="Toggle theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.5-.04-.9-.1-1.3A7 7 0 0 1 13.3 3H12Z"/></svg>
+        </button>
+        <button class="secondary-button" id="export-button">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M5 18v2h14v-2"/></svg>
+          <span data-i18n="exportReport">导出报告</span>
+        </button>
+        <a class="primary-button" href="../README.mbt.md" data-i18n="documentation">使用文档</a>
+      </nav>
+    </header>
+
+    <main class="workspace">
+      <section class="hero-row">
+        <div>
+          <div class="eyebrow"><span></span><b data-i18n="eyebrow">网站抓取与访问策略监控</b></div>
+          <h1 data-i18n-html="heroTitle">MoonRobots<br /><em>网站抓取与策略监控中心</em></h1>
+          <p data-i18n="heroDescription">实时编辑策略、运行受限的真实网站爬虫，并检查每一次 RFC 9309 匹配决策。</p>
+        </div>
+        <div class="score-card" aria-label="Policy health score">
+          <svg class="score-gauge" viewBox="0 0 120 120">
+            <circle class="score-track" cx="60" cy="60" r="52"></circle>
+            <circle id="score-ring" class="score-ring" cx="60" cy="60" r="52"></circle>
+          </svg>
+          <div class="score-copy">
+            <span id="policy-health-label" data-i18n="policyHealth">策略健康度</span>
+            <strong><b id="score-value">—</b><small>/100</small></strong>
+            <em id="score-grade">—</em>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel crawler-panel" aria-labelledby="crawler-title">
+        <header class="panel-header"><div><span class="panel-kicker" data-i18n="realCrawler">真实网站爬虫</span><h2 id="crawler-title" data-i18n="crawlTitle">从一个网址开始，实际抓取并验证策略</h2></div><span class="runtime-status ready" id="crawl-status" data-i18n="crawlReady">等待开始</span></header>
+        <div class="crawler-controls">
+          <label><span data-i18n="crawlMode">抓取模式</span><select id="crawl-mode"><option value="browser" selected data-i18n="browserMode">浏览器渲染</option><option value="http" data-i18n="httpMode">快速 HTTP</option></select></label>
+          <label><span data-i18n="startUrl">起始 URL</span><input id="crawl-url" type="url" value="https://example.com" placeholder="https://example.com" /></label>
+          <label><span data-i18n="crawlerToken">Product Token</span><input id="crawl-token" value="MoonRobotsBot" pattern="[A-Za-z_-]+" /></label>
+          <label><span data-i18n="maxPages">最多页面</span><input id="crawl-pages" type="number" value="20" min="1" max="100" /></label>
+          <label><span data-i18n="maxDepth">最大深度</span><input id="crawl-depth" type="number" value="2" min="0" max="5" /></label>
+          <label><span data-i18n="requestDelay">请求间隔 (ms)</span><input id="crawl-delay" type="number" value="500" min="100" max="10000" /></label>
+          <button class="primary-button" id="crawl-button" data-i18n="startCrawl">开始真实抓取</button>
+        </div>
+        <div class="example-row crawler-examples"><span data-i18n="testSites">可用测试站</span><button data-crawl-example="https://books.toscrape.com/">Books to Scrape</button><button data-crawl-example="https://quotes.toscrape.com/">Quotes to Scrape</button><button data-crawl-example="https://httpbin.org/">httpbin</button></div>
+        <p class="crawler-note" data-i18n="crawlSafety">浏览器模式使用 Edge 执行 JavaScript、处理重定向并保存截图；两种模式都遵守 robots.txt，并阻止本机、内网和特殊用途地址。</p>
+        <div id="crawl-progress" class="crawl-progress" hidden><div class="progress-copy"><strong id="crawl-phase">准备中</strong><span id="crawl-eta">—</span></div><div class="progress-track"><span id="crawl-progress-bar"></span></div><code id="crawl-current-url"></code></div>
+        <div id="crawl-results" class="crawler-results" aria-live="polite"></div>
+        <div id="crawl-assessment" class="crawl-assessment"></div>
+      </section>
+
+      <section class="stat-grid" id="stats" aria-label="Policy statistics"></section>
+
+      <section class="main-grid">
+        <article class="panel editor-panel">
+          <header class="panel-header">
+            <div>
+              <span class="panel-kicker" data-i18n="policySource">策略源码</span>
+              <h2 data-i18n="editorTitle">robots.txt 编辑器</h2>
+            </div>
+            <div class="editor-actions">
+              <button id="copy-button" data-i18n="copy">复制</button>
+              <button id="format-button" data-i18n="format">格式化</button>
+            </div>
+          </header>
+
+          <div class="example-row" aria-label="Load an example policy">
+            <span data-i18n="examples">示例</span>
+            <button data-example="balanced" data-i18n="balanced">均衡策略</button>
+            <button data-example="risky" data-i18n="risky">风险策略</button>
+            <button data-example="agents" data-i18n="multipleAgents">多爬虫策略</button>
+          </div>
+
+          <div class="code-editor">
+            <pre id="line-numbers" aria-hidden="true">1</pre>
+            <textarea id="source" spellcheck="false" aria-label="robots.txt 源码"># MoonRobots Studio 示例
+User-agent: *
+Disallow: /private/
+Allow: /private/public/
+Disallow: /*.pdf$
+
+User-agent: ArchiveBot
+Disallow: /drafts/
+
+Sitemap: https://example.com/sitemap.xml</textarea>
+          </div>
+          <footer class="editor-footer">
+            <span id="source-meta">— lines · — bytes</span>
+            <span>UTF-8 · RFC 9309</span>
+          </footer>
+        </article>
+
+        <aside class="right-column">
+          <article class="panel simulator-panel">
+            <header class="panel-header compact">
+              <div>
+              <span class="panel-kicker" data-i18n="liveSimulator">实时模拟器</span>
+                <h2 data-i18n="testOneRequest">测试单个请求</h2>
+              </div>
+              <span class="mode-chip" id="group-mode">—</span>
+            </header>
+            <div class="input-grid">
+              <label>
+                <span data-i18n="productToken">爬虫 Product Token</span>
+                <input id="agent" value="ExampleBot" placeholder="ExampleBot" />
+              </label>
+              <label>
+                <span data-i18n="urlOrPath">URL 或路径</span>
+                <input id="uri" value="https://example.com/private/report.pdf" placeholder="/path" />
+              </label>
+            </div>
+            <div class="decision-card" id="decision-card">
+              <span class="decision-icon" id="decision-icon">—</span>
+              <div>
+                <span data-i18n="accessDecision">访问决策</span>
+                <strong id="decision-label">分析中</strong>
+                <code id="decision-path">/</code>
+                <p id="decision-reason">Waiting for the MoonBit engine.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="panel trace-panel">
+            <header class="panel-header compact">
+              <div>
+              <span class="panel-kicker" data-i18n="decisionTrace">决策追踪</span>
+                <h2 data-i18n="candidateRules">候选规则</h2>
+              </div>
+              <span class="legend"><i></i> <b data-i18n="specificity">匹配长度</b></span>
+            </header>
+            <div class="candidate-list" id="candidate-list"></div>
+          </article>
+        </aside>
+      </section>
+
+      <section class="panel analysis-panel">
+        <header class="analysis-header">
+          <div>
+            <span class="panel-kicker" data-i18n="deepInspection">深度检查</span>
+            <h2 data-i18n="understandPolicy">理解完整策略</h2>
+          </div>
+          <div class="tabs" role="tablist">
+            <button class="active" data-tab="findings" role="tab"><b data-i18n="findings">分析结果</b> <span id="finding-count">0</span></button>
+            <button data-tab="groups" role="tab" data-i18n="ruleGroups">规则组</button>
+            <button data-tab="batch" role="tab" data-i18n="batchSimulator">批量模拟</button>
+          </div>
+        </header>
+
+        <div class="tab-panel active" data-panel="findings">
+          <div class="fix-toolbar" id="fix-toolbar">
+            <div><strong data-i18n="optimizer">源码保留型优化器</strong><span id="fix-summary">暂无修改建议</span></div>
+            <button id="apply-safe-button" disabled>应用安全修复</button>
+          </div>
+          <div class="finding-list" id="finding-list"></div>
+        </div>
+
+        <div class="tab-panel" data-panel="groups">
+          <div class="group-list" id="group-list"></div>
+        </div>
+
+        <div class="tab-panel" data-panel="batch">
+          <div class="batch-layout">
+            <div class="batch-controls">
+              <label>
+                <span><b data-i18n="urlsOrPaths">URL 或路径</b> <small data-i18n="onePerLine">每行一个</small></span>
+                <textarea id="batch-input" spellcheck="false">/
+/private/report.pdf
+/private/public/index.html
+/drafts/article
+/robots.txt</textarea>
+              </label>
+              <div class="suggested-header">
+                <span data-i18n="generatedCases">自动生成的边界用例</span>
+                <small data-i18n="clickToAdd">点击添加</small>
+              </div>
+              <div class="suggested-paths" id="suggested-paths"></div>
+            </div>
+            <div class="batch-output">
+              <header><h3 data-i18n="simulationResults">模拟结果</h3><span id="batch-summary">—</span></header>
+              <div class="batch-results" id="batch-results"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="feature-strip">
+        <div><span>01</span><strong data-i18n="rfcAware">遵循 RFC</strong><p data-i18n="rfcAwareText">支持最长匹配、Allow 平局、通配规则组和百分号编码。</p></div>
+        <div><span>02</span><strong data-i18n="explainable">可解释</strong><p data-i18n="explainableText">每个决策都保留候选规则、匹配长度和源码行。</p></div>
+        <div><span>03</span><strong data-i18n="localFirst">本地优先</strong><p data-i18n="localFirstText">策略留在浏览器中，无需上传到远程服务器。</p></div>
+        <div><span>04</span><strong data-i18n="moonbitPowered">MoonBit 驱动</strong><p data-i18n="moonbitPoweredText">同一套经过测试的引擎运行于 CLI、JS、Wasm 和 Native。</p></div>
+      </section>
+    </main>
+
+    <footer class="page-footer">
+      <span>MoonRobots Studio · Apache-2.0</span>
+      <span data-i18n="builtWith">使用 MoonBit 构建 · RFC 9309</span>
+    </footer>
+
+    <noscript>MoonRobots Studio 需要启用 JavaScript 才能运行 MoonBit 浏览器版本。</noscript>
+    <script type="module" src="../_build/js/debug/build/web/app/app.js"></script>
+  </body>
+</html>

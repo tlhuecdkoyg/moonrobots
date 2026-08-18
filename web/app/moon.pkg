@@ -1,0 +1,7 @@
+import {
+  "participant/moonrobots" @robots,
+}
+
+supported_targets = "js"
+
+pkgtype(kind: "executable")

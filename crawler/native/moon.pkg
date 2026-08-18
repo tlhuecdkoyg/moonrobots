@@ -1,0 +1,8 @@
+import {
+  "participant/moonrobots" @robots,
+  "moonbitlang/async",
+  "moonbitlang/async/http",
+  "moonbitlang/async/socket",
+}
+
+supported_targets = "+native"

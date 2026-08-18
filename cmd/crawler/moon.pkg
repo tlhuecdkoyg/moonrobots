@@ -1,0 +1,12 @@
+import {
+  "participant/moonrobots" @robots,
+  "participant/moonrobots/crawler/native" @nativecrawler,
+  "moonbitlang/async",
+  "moonbitlang/core/env",
+  "moonbitlang/core/string",
+  "moonbitlang/x/sys",
+}
+
+supported_targets = "+native"
+
+pkgtype(kind: "executable")

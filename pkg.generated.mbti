@@ -1,0 +1,449 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "participant/moonrobots"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn access_matrix_to_markdown(AccessMatrix) -> String
+
+pub fn analysis_to_markdown(PolicyAnalysis) -> String
+
+pub fn analyze(String) -> PolicyAnalysis
+
+pub fn analyze_rule_coverage(Policy, String, String) -> CoverageReport
+
+pub fn analyze_suggested_coverage(Policy, String) -> CoverageReport
+
+pub fn apply_fix_plan(String, FixPlan, Bool) -> String
+
+pub fn apply_safe_fixes(String) -> String
+
+pub fn batch_to_csv(BatchReport) -> String
+
+pub fn batch_to_markdown(BatchReport) -> String
+
+pub fn blocked_sample_paths(Policy, String, String) -> Array[String]
+
+pub fn build_access_matrix(Policy, String, String) -> AccessMatrix
+
+pub fn build_fix_plan(String) -> FixPlan
+
+pub fn classify_html_links(String, String, Int, Int, Array[String]) -> Array[DiscoveredLink]
+
+pub fn compare_policies(String, String, String, String) -> PolicyDiff
+
+pub fn coverage_to_markdown(CoverageReport) -> String
+
+pub fn crawl_report_to_json(CrawlReport) -> String
+
+pub fn default_allowed_paths(Policy, String, String) -> Array[String]
+
+pub fn evaluate(Policy, String, String) -> Decision
+
+pub fn evaluate_batch(Policy, String, String) -> BatchReport
+
+pub fn evaluate_with_trace(Policy, String, String) -> DecisionTrace
+
+pub fn explain(Decision) -> String
+
+pub fn extract_html_hrefs(String) -> Array[String]
+
+pub fn extract_html_title(String) -> String
+
+pub fn fix_plan_to_markdown(FixPlan) -> String
+
+pub fn format_analysis(PolicyAnalysis) -> String
+
+pub fn format_crawl_report(CrawlReport) -> String
+
+pub fn format_diagnostics(Policy) -> String
+
+pub fn format_policy(Policy) -> String
+
+pub fn format_trace(DecisionTrace) -> String
+
+pub fn generate_policy(GeneratorConfig) -> GeneratedPolicy
+
+pub fn generated_policy_to_markdown(GeneratedPolicy) -> String
+
+pub fn generator_preset(String, String) -> GeneratorConfig
+
+pub fn is_allowed(String, String, String) -> Bool
+
+pub fn match_pattern(String, String) -> (Bool, Int)
+
+pub fn normalize_crawl_config(CrawlConfig) -> CrawlConfig?
+
+pub fn parse(String) -> Policy
+
+pub fn parse_crawl_url(String) -> CrawlUrl?
+
+pub fn path_from_uri(String) -> String
+
+pub fn policy_diff_to_markdown(PolicyDiff) -> String
+
+pub fn queued_link_tasks(Array[DiscoveredLink]) -> Array[CrawlTask]
+
+pub fn resolve_crawl_link(String, String) -> CrawlUrl?
+
+pub fn same_crawl_origin(String, String) -> Bool
+
+pub fn studio_snapshot(String, String, String, String) -> String
+
+pub fn suggest_test_paths(Policy) -> Array[String]
+
+pub fn trace_to_markdown(DecisionTrace) -> String
+
+pub fn unsafe_crawl_host(String) -> Bool
+
+// Errors
+
+// Types and methods
+pub(all) struct AccessMatrix {
+  product_tokens : Array[String]
+  uris : Array[String]
+  cells : Array[MatrixCell]
+  allowed_count : Int
+  disallowed_count : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) struct BatchReport {
+  product_token : String
+  results : Array[BatchResult]
+  allowed_count : Int
+  disallowed_count : Int
+  invalid_count : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) struct BatchResult {
+  index : Int
+  uri : String
+  decision : Decision
+} derive(Eq, @debug.Debug)
+
+pub(all) enum CandidateStatus {
+  Selected
+  Matched
+  NotMatched
+  LessSpecific
+  LostAllowTie
+} derive(Eq, @debug.Debug)
+
+pub(all) struct CoverageReport {
+  product_token : String
+  sample_count : Int
+  rule_count : Int
+  exercised_count : Int
+  selected_rule_count : Int
+  unused_rule_count : Int
+  shadowed_rule_count : Int
+  coverage_percent : Int
+  usages : Array[RuleUsage]
+} derive(Eq, @debug.Debug)
+
+pub(all) struct CrawlConfig {
+  start_url : String
+  product_token : String
+  max_pages : Int
+  max_depth : Int
+  delay_ms : Int
+  max_body_bytes : Int
+  respect_robots : Bool
+} derive(Eq, ToJson, @debug.Debug)
+
+pub(all) struct CrawlPage {
+  url : String
+  depth : Int
+  status : CrawlPageStatus
+  http_status : Int?
+  content_type : String
+  title : String
+  bytes : Int
+  elapsed_ms : Int
+  matched_rule : String?
+  message : String
+  outgoing_links : Int
+} derive(Eq, ToJson, @debug.Debug)
+
+pub(all) enum CrawlPageStatus {
+  Fetched
+  BlockedByRobots
+  SkippedNonHtml
+  HttpError
+  NetworkError
+  TooLarge
+} derive(Eq, ToJson, @debug.Debug)
+
+pub(all) struct CrawlReport {
+  start_url : String
+  origin : String
+  product_token : String
+  robots_url : String
+  robots_status : Int?
+  robots_text : String
+  started_at : String
+  finished_at : String
+  pages : Array[CrawlPage]
+  links : Array[DiscoveredLink]
+  fetched_count : Int
+  blocked_count : Int
+  failed_count : Int
+  skipped_count : Int
+  bytes_downloaded : Int
+  stopped_reason : String
+} derive(Eq, ToJson, @debug.Debug)
+
+pub(all) struct CrawlTask {
+  url : String
+  depth : Int
+  discovered_from : String?
+} derive(Eq, ToJson, @debug.Debug)
+
+pub(all) struct CrawlUrl {
+  scheme : String
+  host : String
+  port : Int
+  path_query : String
+  origin : String
+  normalized : String
+} derive(Eq, ToJson, @debug.Debug)
+
+pub(all) struct Decision {
+  allowed : Bool
+  user_agent : String
+  path : String
+  matched : MatchedRule?
+  used_wildcard_group : Bool
+} derive(Eq, @debug.Debug)
+
+pub(all) struct DecisionChange {
+  product_token : String
+  uri : String
+  before_allowed : Bool
+  after_allowed : Bool
+  before_pattern : String?
+  after_pattern : String?
+} derive(Eq, @debug.Debug)
+
+pub(all) struct DecisionTrace {
+  decision : Decision
+  selected_agents : Array[String]
+  candidates : Array[RuleCandidate]
+  exact_group_count : Int
+  wildcard_group_count : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Diagnostic {
+  severity : Severity
+  line : Int
+  code : String
+  message : String
+} derive(Eq, @debug.Debug)
+
+pub(all) struct DiscoveredLink {
+  source_url : String
+  raw_href : String
+  normalized_url : String?
+  depth : Int
+  disposition : LinkDisposition
+} derive(Eq, ToJson, @debug.Debug)
+
+pub(all) enum EditKind {
+  DeleteLine
+  ReplaceLine
+  InsertAfter
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Finding {
+  severity : Severity
+  category : FindingCategory
+  code : String
+  title : String
+  message : String
+  lines : Array[Int]
+  suggestion : String
+} derive(Eq, @debug.Debug)
+
+pub(all) enum FindingCategory {
+  Syntax
+  Correctness
+  Redundancy
+  Maintainability
+  Security
+} derive(Eq, @debug.Debug)
+
+pub(all) struct FixPlan {
+  edits : Array[SourceEdit]
+  safe_count : Int
+  review_count : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) enum FixSafety {
+  Safe
+  Review
+} derive(Eq, @debug.Debug)
+
+pub(all) struct GeneratedAgentGroup {
+  agents : Array[String]
+  disallow_paths : Array[String]
+  allow_paths : Array[String]
+} derive(Eq, @debug.Debug)
+
+pub(all) struct GeneratedPolicy {
+  source : String
+  warnings : Array[String]
+  rule_count : Int
+  group_count : Int
+  sitemap_count : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) struct GeneratorConfig {
+  site_origin : String
+  project_name : String
+  default_disallow_paths : Array[String]
+  default_allow_paths : Array[String]
+  agent_groups : Array[GeneratedAgentGroup]
+  sitemap_paths : Array[String]
+  include_header : Bool
+  include_guidance : Bool
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Group {
+  agents : Array[String]
+  rules : Array[Rule]
+  line : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) enum LinkDisposition {
+  Queued
+  Duplicate
+  DifferentOrigin
+  UnsupportedScheme
+  UnsafeHost
+  InvalidUrl
+  DepthExceeded
+} derive(Eq, ToJson, @debug.Debug)
+
+pub(all) struct MatchedRule {
+  kind : RuleKind
+  pattern : String
+  line : Int
+  specificity : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) struct MatrixCell {
+  product_token : String
+  uri : String
+  allowed : Bool
+  matched_line : Int?
+  matched_pattern : String?
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Policy {
+  groups : Array[Group]
+  sitemaps : Array[String]
+  diagnostics : Array[Diagnostic]
+} derive(Eq, @debug.Debug)
+
+pub(all) struct PolicyAnalysis {
+  policy : Policy
+  stats : PolicyStats
+  findings : Array[Finding]
+  score : Int
+  grade : String
+} derive(Eq, @debug.Debug)
+
+pub(all) struct PolicyChange {
+  kind : PolicyChangeKind
+  summary : String
+  detail : String
+  before_line : Int?
+  after_line : Int?
+  risk : Severity
+} derive(Eq, @debug.Debug)
+
+pub(all) enum PolicyChangeKind {
+  GroupAdded
+  GroupRemoved
+  RuleAdded
+  RuleRemoved
+  SitemapAdded
+  SitemapRemoved
+  AccessOpened
+  AccessClosed
+} derive(Eq, @debug.Debug)
+
+pub(all) struct PolicyDiff {
+  changes : Array[PolicyChange]
+  decisions : Array[DecisionChange]
+  opened_count : Int
+  closed_count : Int
+  unchanged_count : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) struct PolicyStats {
+  source_lines : Int
+  source_bytes : Int
+  group_count : Int
+  agent_count : Int
+  rule_count : Int
+  allow_count : Int
+  disallow_count : Int
+  sitemap_count : Int
+  wildcard_count : Int
+  anchored_count : Int
+  diagnostic_count : Int
+  finding_count : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) struct Rule {
+  kind : RuleKind
+  pattern : String
+  line : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) struct RuleCandidate {
+  kind : RuleKind
+  pattern : String
+  line : Int
+  matched : Bool
+  specificity : Int
+  status : CandidateStatus
+} derive(Eq, @debug.Debug)
+
+pub(all) enum RuleKind {
+  Allow
+  Disallow
+} derive(Eq, ToJson, @debug.Debug)
+
+pub(all) struct RuleUsage {
+  kind : RuleKind
+  pattern : String
+  line : Int
+  considered_count : Int
+  matched_count : Int
+  selected_count : Int
+  allow_decision_count : Int
+  disallow_decision_count : Int
+} derive(Eq, @debug.Debug)
+
+pub(all) enum Severity {
+  Warning
+  Error
+} derive(Eq, @debug.Debug)
+
+pub(all) struct SourceEdit {
+  kind : EditKind
+  line : Int
+  replacement : String
+  code : String
+  title : String
+  reason : String
+  safety : FixSafety
+} derive(Eq, @debug.Debug)
+
+// Type aliases
+
+// Traits

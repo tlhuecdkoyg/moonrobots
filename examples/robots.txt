@@ -1,0 +1,9 @@
+# Example policy used by the README and CLI smoke tests.
+User-agent: *
+Disallow: /private/
+Allow: /private/public/
+
+User-agent: ArchiveBot
+Disallow: /archive/drafts/
+
+Sitemap: https://example.com/sitemap.xml
